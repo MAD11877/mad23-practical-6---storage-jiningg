@@ -40,17 +40,18 @@ public class MainActivity extends AppCompatActivity {
             else{
                 follow.setText("Unfollow");
             }
+
             follow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(user.userFollowed == false){
+                    if(!user.userFollowed){
                         follow.setText("Unfollow");
-                        user.userFollowed = true;
+                        user.setUserFollowed(true);
                         dbHandler.updateUser(user);
                         Toast.makeText(MainActivity.this, "Followed", Toast.LENGTH_SHORT).show();
                     } else {
-                        user.userFollowed = false;
                         follow.setText("Follow");
+                        user.setUserFollowed(false);
                         dbHandler.updateUser(user);
                         Toast.makeText(MainActivity.this, "Unfollowed", Toast.LENGTH_SHORT).show();
                     }
