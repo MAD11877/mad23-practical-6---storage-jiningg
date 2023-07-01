@@ -21,67 +21,42 @@ import java.util.ArrayList;
 public class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
     ArrayList<User> userData;
 
-    public UserAdapter (Context context, ArrayList<User> input){
-        userData = input;
+    public UserAdapter(ArrayList<User> input){
+        this.userData = input;
     }
 
-    @NonNull
-    @Override
-    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View item = null;
-
-        if(viewType == 7) {
-            item = LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.recycler_view_item2,
-                    parent,
-                    false
-            );
+    public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        View item;
+        if (viewType == 1) {
+            item = inflater.inflate(R.layout.recycler_view_item2, parent, false);
         } else {
-            item = LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.recycler_view_item,
-                    parent,
-                    false
-            );
+            item = inflater.inflate(R.layout.recycler_view_item, parent, false);
         }
-        return new UserViewHolder(item);
+        return new UserViewHolder(item, userData, viewType);
+    }
+
+    public void onBindViewHolder(UserViewHolder holder, int position){
+        User user_details = userData.get(position);
+        holder.txt.setText(user_details.getUserName());
+        holder.desc.setText(user_details.getUserDescription());
+    }
+
+    public int getItemCount(){
+        return userData.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return Integer.parseInt(userData.get(position).userName.substring(userData.get(position).userName.length()-1));
-    }
+        String name = userData.get(position).getUserName();
+        // Get the last digit of the name
+        int lastDigit = Integer.parseInt(name.substring(name.length() - 1));
 
-    @Override
-    public void onBindViewHolder(@NonNull UserViewHolder holder, @SuppressLint("RecyclerView") int position) {
-        User user = userData.get(position);
-        holder.txt.setText(user.userName);
-        holder.desc.setText(user.userDescription);
-
-
-        holder.image.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Log.d("Debug", "Image clicked");
-
-                new AlertDialog.Builder(holder.image.getContext())
-                        .setTitle("Profile")
-                        .setMessage(user.userName)
-                        .setPositiveButton("View", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent viewProfile = new Intent(holder.image.getContext(), MainActivity.class);
-                                viewProfile.putExtra("id", position);
-                                holder.image.getContext().startActivity(viewProfile);
-                            }
-                        })
-                        .setNegativeButton("Close", null)
-                        .show();
-            }
-        });
-    }
-
-
-    public int getItemCount(){
-        return userData.size();
+        // Check if the last digit is 7
+        if (lastDigit == 7) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }

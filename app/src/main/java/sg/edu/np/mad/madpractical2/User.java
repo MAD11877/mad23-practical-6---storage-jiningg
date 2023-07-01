@@ -1,17 +1,20 @@
 package sg.edu.np.mad.madpractical2;
 
-public class User {
-    String userName;
+import java.io.Serializable;
 
-    String userDescription;
+public class User implements Serializable {
+    public String userName;
 
-    int userId;
+    public String userDescription;
 
-    boolean userFollowed;
+    public int userId;
 
-    public User(String userName, String userDescription, boolean userFollowed) {
+    public boolean userFollowed;
+
+    public User(String userName, String userDescription, int userId, boolean userFollowed) {
         this.userName = userName;
         this.userDescription = userDescription;
+        this.userId = userId;
         this.userFollowed = userFollowed;
     }
 

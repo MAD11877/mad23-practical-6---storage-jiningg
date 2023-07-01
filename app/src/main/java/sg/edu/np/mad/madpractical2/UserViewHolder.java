@@ -20,10 +20,57 @@ public class UserViewHolder extends RecyclerView.ViewHolder {
     TextView desc;
     ImageView image;
 
-    public UserViewHolder(View itemView){
+    ArrayList<User> userData;
+
+    public UserViewHolder(View itemView, ArrayList<User> user_list, int viewType){
         super(itemView);
+        this.userData = user_list;
         txt = itemView.findViewById(R.id.textView5);
         desc = itemView.findViewById(R.id.textView6);
         image = itemView.findViewById(R.id.imageView2);
+
+        // Set additional properties for the special layout
+        if (viewType == 1) {
+            ImageView specialImageView = itemView.findViewById(R.id.imageView4);
+
+            specialImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showAlertDialog(userData);
+                }
+            });
+        }
+
+        image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                showAlertDialog(userData);
+                showAlertDialog(userData);
+            }
+        });
+
+    }
+    private void showAlertDialog(ArrayList<User> userData) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
+        User selectedUser = userData.get(getAdapterPosition());
+        builder.setTitle("Profile");
+        builder.setMessage(selectedUser.getUserName());
+        builder.setPositiveButton("View", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    User selectedUser = userData.get(getAdapterPosition());
+                    Intent profileIntent = new Intent(itemView.getContext(), MainActivity.class);
+                    profileIntent.putExtra("selected_user", selectedUser);
+                    itemView.getContext().startActivity(profileIntent);
+
+                }
+            }
+        });
+
+        builder.setNegativeButton("Close", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class ListActivity extends AppCompatActivity {
-
-    static ArrayList<User> userList = new ArrayList<>();
+    ArrayList<User> userList = new ArrayList<>();
     final String title = "List Activity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,41 +25,27 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
         Log.v(title, "Create!");
 
-        for (int i = 0; i < 20; i++) {
-            String randomName = generateRandomName();
-            String randomDescription = generateRandomDescription();
-            boolean randomFollowed = generateRandomFollowedValue();
+        MyDBHandler dbHandler = new MyDBHandler(this, null, null, 1);
 
-            User user = new User(randomName, randomDescription, randomFollowed);
-            userList.add(user);
+        // randomize the name and description of the 20 users
+        for (int i = 0; i < 20; i++) {
+            Random random = new Random();
+            int randNameNumber = random.nextInt(Integer.MAX_VALUE - 10000000) + 10000000;
+            String name = "Name-" + randNameNumber;
+            int randDescNumber = random.nextInt(Integer.MAX_VALUE - 10000000) + 10000000;
+            String desc = "Description-" +  randDescNumber;
+            User user = new User(name, desc, i, false);
+
+            // adding user to db
+            dbHandler.addUser(user);
         }
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        UserAdapter userAdapter = new UserAdapter(ListActivity.this, userList);
+        // set the recycler view and layout animation
+        androidx.recyclerview.widget.RecyclerView recyclerView = findViewById(R.id.recyclerview);
+        UserAdapter userAdapter = new UserAdapter(dbHandler.getUsers());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(userAdapter);
-    }
-
-    private int randomInteger(){
-        Random ran = new Random();
-        int myRandomNumber = ran.nextInt();
-        return myRandomNumber;
-    }
-
-    private String generateRandomName(){
-        String name = "Name";
-        Integer num = randomInteger();
-        return name + num;
-    }
-
-    private String generateRandomDescription(){
-        String desc = "Description ";
-        Integer num = randomInteger();
-        return desc + num;
-    }
-
-    private boolean generateRandomFollowedValue(){
-        Random random = new Random();
-        return random.nextBoolean();
     }
 }

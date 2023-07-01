@@ -2,6 +2,7 @@ package sg.edu.np.mad.madpractical2;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,42 +14,48 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
     final String title = "Main Activity";
 
-    User myUser = new User();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.v(title, "Create!");
 
-        Intent rec = getIntent();
-        int value = rec.getIntExtra("id",0);
-        myUser = ListActivity.userList.get(value);
+        TextView UserName= findViewById(R.id.textView2);
+        TextView UserDesc = findViewById(R.id.textView);
 
-        TextView name = findViewById(R.id.textView2);
-        name.setText(myUser.getUserName());
-        TextView description = findViewById(R.id.textView);
-        description.setText(myUser.getUserDescription());
-        setFollowBtn();
-    }
+        Intent intent= getIntent();
+        User user = (User) intent.getSerializableExtra("selected_user");
 
-    private void setFollowBtn() {
-        Button follow = findViewById(R.id.followBtn);
-        if(myUser.userFollowed) {
-            follow.setText("Unfollow");
-            Log.v(title,"Button: Follow clicked!");
+        // create a new db handler to reference
+        MyDBHandler dbHandler = new MyDBHandler(this, null, null, 1);
+        if (user != null) {
+            UserName.setText(user.getUserName());
+            UserDesc.setText(user.getUserDescription());
+            Log.v("User ID", String.valueOf(user.getUserId()));
+
+            Button follow = findViewById(R.id.followBtn);
+            if(!user.userFollowed){
+                follow.setText("Follow");
+            }
+            else{
+                follow.setText("Unfollow");
+            }
+            follow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(user.userFollowed == false){
+                        follow.setText("Unfollow");
+                        user.userFollowed = true;
+                        dbHandler.updateUser(user);
+                        Toast.makeText(MainActivity.this, "Followed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        user.userFollowed = false;
+                        follow.setText("Follow");
+                        dbHandler.updateUser(user);
+                        Toast.makeText(MainActivity.this, "Unfollowed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
-        else {
-            follow.setText("Follow");
-            Log.v(title,"Button: Unfollow clicked!");
-        }
-    }
-
-    public void onFollowClick(View v) {
-        myUser.userFollowed = !myUser.userFollowed;
-        if(myUser.userFollowed)
-            Toast.makeText(this, "Followed", Toast.LENGTH_SHORT).show();
-        else
-            Toast.makeText(this,"Unfollowed", Toast.LENGTH_SHORT).show();
-        setFollowBtn();
     }
 }
